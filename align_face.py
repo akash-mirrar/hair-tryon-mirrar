@@ -36,7 +36,7 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 def orientation_check(args):
     upload_path = os.path.join("./", args.upload_dir)
     unprocessed_path = os.path.join("./", args.unprocessed_dir)
-    print(upload_path)
+    print(unprocessed_path)
     for filename in os.listdir(upload_path):
         img = cv2.imread(os.path.join(upload_path, filename))
         

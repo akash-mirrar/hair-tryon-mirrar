@@ -43,12 +43,12 @@ def blur_face(img):
     return img
     # cv2.imwrite(target_directory_path + filename, img)
 
-for filename in os.listdir(unprocessed_path):
+# for filename in os.listdir(unprocessed_path):
 
-    img = cv2.imread(unprocessed_path + filename)
+#     img = cv2.imread(unprocessed_path + filename)
     
-    # img = blur_face(img)
-    img = crop_image(img)
-    img = cv2.resize(img, (1024, 1024))
-    cv2.imwrite(face_path+"new-"+filename.split(".")[0]+".png", img)
+#     # img = blur_face(img)
+#     img = crop_image(img)
+#     img = cv2.resize(img, (1024, 1024))
+#     cv2.imwrite(face_path+"new-"+filename.split(".")[0]+".png", img)
     # shutil.move(unprocessed_path+filename, face_path)

@@ -30,7 +30,7 @@ param_parser.add_argument('--size', type=int, default=1024)
 param_parser.add_argument('--ckpt', type=str, default="pretrained_models/ffhq.pt")
 param_parser.add_argument('--channel_multiplier', type=int, default=2)
 param_parser.add_argument('--latent', type=int, default=512)
-param_parser.add_argument('--n_mlp', type=int, defau
+param_parser.add_argument('--n_mlp', type=int, default=8)
 # Arguments
 param_parser.add_argument('--device', type=str, default='cuda')
 param_parser.add_argument('--seed', type=int, default=None)
@@ -42,7 +42,7 @@ param_parser.add_argument('--save_intermediate', action='store_true',
                     help='Whether to store and save intermediate HR and LR images during optimization')
 param_parser.add_argument('--save_interval', type=int, default=400, help='Latent checkpoint interval')
 param_parser.add_argument('--verbose', action='store_true', help='Print loss information')
-param_parser.add_argument('--seg_ckpt', type=str, default='pretrained_models/seg.
+param_parser.add_argument('--seg_ckpt', type=str, default='pretrained_models/seg.pth')
 # Embedding loss options
 param_parser.add_argument('--percept_lambda', type=float, default=1.0, help='Perceptual loss multiplier factor')
 param_parser.add_argument('--l2_lambda', type=float, default=1.0, help='L2 loss multiplier factor')
@@ -59,3 +59,8 @@ param_parser.add_argument('--align_steps2', type=int, default=1, help='')
 param_parser.add_argument('--face_lambda', type=float, default=1, help='')
 param_parser.add_argument('--hair_lambda', type=str, default=1.0, help='')
 param_parser.add_argument('--blend_steps', type=int, default=400, help='')
+
+
+# args = param_parser.parse_args()
+# args.blend_steps = 100
+# print(args.blend_steps)
