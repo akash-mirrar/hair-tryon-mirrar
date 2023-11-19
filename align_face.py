@@ -4,10 +4,11 @@ import argparse
 import torchvision
 from utils.drive import open_url
 from utils.shape_predictor import align_face
-import PIL
+import PIL, os, cv2
+from align import crop_image
 
 parser = argparse.ArgumentParser(description='Align_face')
-
+parser.add_argument('-upload_dir', type=str, default='upload_dir', help='image uploaded will be stored in this directory')
 parser.add_argument('-unprocessed_dir', type=str, default='unprocessed', help='directory with unprocessed images')
 parser.add_argument('-output_dir', type=str, default='input/face', help='output directory')
 
@@ -32,19 +33,35 @@ output_dir.mkdir(parents=True,exist_ok=True)
 # f=open_url("https://drive.google.com/uc?id=1huhv8PYpNNKbGCLOaYUjOgR1pY5pmbJx", cache_dir=cache_dir, return_path=True)
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-for im in Path(args.unprocessed_dir).glob("*.*"):
-    faces = align_face(str(im),predictor)
+def orientation_check(args):
+    upload_path = os.path.join("./", args.upload_dir)
+    unprocessed_path = os.path.join("./", args.unprocessed_dir)
+    print(upload_path)
+    for filename in os.listdir(upload_path):
+        img = cv2.imread(os.path.join(upload_path, filename))
+        
+        # img = blur_face(img)
+        img = crop_image(img)
+        img = cv2.resize(img, (1024, 1024))
+        cv2.imwrite(unprocessed_path + '/' +filename.split(".")[0]+".png", img)
 
-    for i,face in enumerate(faces):
-        if(args.output_size):
-            factor = 1024//args.output_size
-            assert args.output_size*factor == 1024
-            face_tensor = torchvision.transforms.ToTensor()(face).unsqueeze(0).cuda()
-            face_tensor_lr = face_tensor[0].cuda().detach().clamp(0, 1)
-            face = torchvision.transforms.ToPILImage()(face_tensor_lr)
-            if factor != 1:
-                face = face.resize((args.output_size, args.output_size), PIL.Image.LANCZOS)
-        if len(faces) > 1:
-            face.save(Path(args.output_dir) / (im.stem+f"_{i}.png"))
-        else:
-            face.save(Path(args.output_dir) / (im.stem + f".png"))
+def run_face_alignment(args):
+    orientation_check(args)
+    for im in Path(args.unprocessed_dir).glob("*.*"):
+        faces = align_face(str(im),predictor)
+
+        for i,face in enumerate(faces):
+            if(args.output_size):
+                factor = 1024//args.output_size
+                assert args.output_size*factor == 1024
+                face_tensor = torchvision.transforms.ToTensor()(face).unsqueeze(0).cuda()
+                face_tensor_lr = face_tensor[0].cuda().detach().clamp(0, 1)
+                face = torchvision.transforms.ToPILImage()(face_tensor_lr)
+                if factor != 1:
+                    face = face.resize((args.output_size, args.output_size), PIL.Image.LANCZOS)
+            if len(faces) > 1:
+                face.save(Path(args.output_dir) / (im.stem+f"_{i}.png"))
+            else:
+                face.save(Path(args.output_dir) / (im.stem + f".png"))
+
+# run_face_alignment(args)
