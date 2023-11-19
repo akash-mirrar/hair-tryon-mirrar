@@ -12,6 +12,7 @@ from PIL import Image
 from models.Embedding import Embedding
 from models.Alignment import Alignment
 from models.Blending import Blending
+from swap import swap_face
 
 def main(args):
     ii2_start_time = datetime.now()
@@ -123,21 +124,21 @@ if __name__ == "__main__":
     parser.add_argument('--p_norm_lambda', type=float, default=0.001, help='P-norm Regularizer multiplier factor')
     parser.add_argument('--l_F_lambda', type=float, default=0.5, help='L_F loss multiplier factor')
     parser.add_argument('--W_steps', type=int, default=10, help='Number of W space optimization steps')
-    parser.add_argument('--FS_steps', type=int, default=50, help='Number of FS space optimization steps')
+    parser.add_argument('--FS_steps', type=int, default=150, help='Number of FS space optimization steps')
 
 
 
     # Alignment loss options
     parser.add_argument('--ce_lambda', type=float, default=1.0, help='cross entropy loss multiplier factor')
     parser.add_argument('--style_lambda', type=str, default=4e4, help='style loss multiplier factor')
-    parser.add_argument('--align_steps1', type=int, default=30, help='')
-    parser.add_argument('--align_steps2', type=int, default=30, help='')
+    parser.add_argument('--align_steps1', type=int, default=140, help='')
+    parser.add_argument('--align_steps2', type=int, default=1, help='')
 
 
     # Blend loss options
-    parser.add_argument('--face_lambda', type=float, default=2, help='')
-    parser.add_argument('--hair_lambda', type=str, default=10.0, help='')
-    parser.add_argument('--blend_steps', type=int, default=100, help='')
+    parser.add_argument('--face_lambda', type=float, default=1, help='')
+    parser.add_argument('--hair_lambda', type=str, default=1.0, help='')
+    parser.add_argument('--blend_steps', type=int, default=400, help='')
 
 
 
@@ -145,6 +146,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     start_time = datetime.now()
     main(args)
+
+    swap_face(src_img=args.input_dir+"/"+args.im_path1, dest_img=args.output_dir+"/"+args.im_path1.split('.')[0]+"_"+args.im_path2.split('.')[0]+"_"+args.im_path3.split('.')[0]+"_"+"realistic.png")
     end_time = datetime.now()
     
     print("Process starts: ", start_time)
