@@ -8,6 +8,7 @@ import ssl, certifi
 from uuid import uuid4
 import jwt
 from config import *
+from swap import swap_face
 
 user_collection = db["user"]
 
@@ -108,6 +109,7 @@ def tryon(current_user):
 
     run_alignment(param_args)
     blend_images(param_args)
+    swap_face(param_args, current_user)
     
     return jsonify(message="Alignment and Blending done successfully")
 

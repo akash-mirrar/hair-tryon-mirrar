@@ -5,7 +5,10 @@ import numpy as np
 face_detector = dlib.get_frontal_face_detector()
 points_detector = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat")
 
-def swap_face(src_img, dest_img):
+def swap_face(param_args, current_user):
+    src_img=param_args.input_dir+"/"+param_args.im_path1
+    dest_img=param_args.output_dir+"/"+param_args.im_path1.split('.')[0]+"_"+param_args.im_path2.split('.')[0]+"_"+param_args.im_path3.split('.')[0]+"_"+"realistic.png"
+    
     def extract_index_nparray(nparray):
         index = None
         for num in nparray[0]:
@@ -170,4 +173,4 @@ def swap_face(src_img, dest_img):
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
 
-    cv2.imwrite("./output/clone.png", seamlessclone)
+    cv2.imwrite(param_args.output_dir+"/"+"clone.png", seamlessclone)
