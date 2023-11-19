@@ -14,6 +14,39 @@ from models.Alignment import Alignment
 from models.Blending import Blending
 from swap import swap_face
 
+def generate_embeddings(args):
+    embeddings = Embedding(args)
+
+    im_path1 = os.path.join(args.input_dir, args.im_path1)
+    im_path2 = os.path.join(args.input_dir, args.im_path2)
+    im_path3 = os.path.join(args.input_dir, args.im_path3)
+
+    im_set = {im_path1, im_path2, im_path3}
+
+    embeddings.invert_images_in_W([*im_set])
+    embeddings.invert_images_in_FS([*im_set])
+
+
+def run_alignment(args):
+    im_path1 = os.path.join(args.input_dir, args.im_path1)
+    im_path2 = os.path.join(args.input_dir, args.im_path2)
+    im_path3 = os.path.join(args.input_dir, args.im_path3)
+
+    align = Alignment(args)
+    align.align_images(im_path1, im_path2, sign=args.sign, align_more_region=False, smooth=args.smooth)
+
+    if im_path2 != im_path3:
+        align.align_images(im_path1,im_path3, sign=args.sign, align_more_region=False, smooth=args.smooth)
+
+def blend_images(args):
+    im_path1 = os.path.join(args.input_dir, args.im_path1)
+    im_path2 = os.path.join(args.input_dir, args.im_path2)
+    im_path3 = os.path.join(args.input_dir, args.im_path3)
+
+    blend = Blending(args)
+
+    blend.blend_images(im_path1, im_path2, im_path3, sign=args.sign)
+
 def main(args):
     ii2_start_time = datetime.now()
     print(f"### Starting II2S Embedding ###: {ii2_start_time}")
