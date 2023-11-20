@@ -41,7 +41,6 @@ def blur_face(img):
         img[y:y+roi.shape[0], x:x+roi.shape[1]] = roi
     cv2.imwrite("./junk/test.png", img)
     return img
-    # cv2.imwrite(target_directory_path + filename, img)
 
 # for filename in os.listdir(unprocessed_path):
 

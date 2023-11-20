@@ -123,7 +123,7 @@ if __name__ == "__main__":
     parser.add_argument('--p_norm_lambda', type=float, default=0.001, help='P-norm Regularizer multiplier factor')
     parser.add_argument('--l_F_lambda', type=float, default=0.5, help='L_F loss multiplier factor')
     parser.add_argument('--W_steps', type=int, default=100, help='Number of W space optimization steps')
-    parser.add_argument('--FS_steps', type=int, default=50, help='Number of FS space optimization steps')
+    parser.add_argument('--FS_steps', type=int, default=200, help='Number of FS space optimization steps')
 
 
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     # Blend loss options
     parser.add_argument('--face_lambda', type=float, default=2, help='')
     parser.add_argument('--hair_lambda', type=str, default=10.0, help='')
-    parser.add_argument('--blend_steps', type=int, default=30, help='')
+    parser.add_argument('--blend_steps', type=int, default=200, help='')
 
 
 
