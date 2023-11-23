@@ -6,6 +6,8 @@ from utils.drive import open_url
 from utils.shape_predictor import align_face
 import PIL, os, cv2
 from align import crop_image
+from datetime import datetime
+from rembg import remove
 
 parser = argparse.ArgumentParser(description='Align_face')
 parser.add_argument('-upload_dir', type=str, default='upload_dir', help='image uploaded will be stored in this directory')
@@ -39,13 +41,16 @@ def orientation_check(args):
     print(unprocessed_path)
     for filename in os.listdir(upload_path):
         img = cv2.imread(os.path.join(upload_path, filename))
-        
+        rembg = remove(img)
         # img = blur_face(img)
         img = crop_image(img)
         img = cv2.resize(img, (1024, 1024))
         cv2.imwrite(unprocessed_path + '/' +filename.split(".")[0]+".png", img)
 
 def run_face_alignment(args):
+    face_align_start_time = datetime.now()
+    print(f"Face alignment start time: {face_align_start_time}")
+
     orientation_check(args)
     for im in Path(args.unprocessed_dir).glob("*.*"):
         faces = align_face(str(im),predictor)
@@ -64,4 +69,7 @@ def run_face_alignment(args):
             else:
                 face.save(Path(args.output_dir) / (im.stem + f".png"))
 
+    face_align_end_time = datetime.now()
+    print(f"Face alignment start time: {face_align_end_time}")
+    print(f"Time taken for Bledning: {face_align_end_time-face_align_start_time}")
 # run_face_alignment(args)

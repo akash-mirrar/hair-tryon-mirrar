@@ -223,6 +223,8 @@ class Embedding(nn.Module):
         output_dir = os.path.join(self.opts.output_dir, 'FS')
         os.makedirs(output_dir, exist_ok=True)
 
+        print(os.path.join(output_dir, f'{ref_name[0]}.npz'))
+        
         latent_path = os.path.join(output_dir, f'{ref_name[0]}.npz')
         image_path = os.path.join(output_dir, f'{ref_name[0]}.png')
 
