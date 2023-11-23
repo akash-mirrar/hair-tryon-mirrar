@@ -87,7 +87,7 @@ class Embedding(nn.Module):
     def setup_dataloader(self, image_path=None):
 
         self.dataset = ImagesDataset(opts=self.opts,image_path=image_path)
-        self.dataloader = DataLoader(self.dataset, batch_size=1, shuffle=False)
+        self.dataloader = DataLoader(self.dataset, batch_size=1, shuffle=True)
         print("Number of images: {}".format(len(self.dataset)))
 
     def setup_embedding_loss_builder(self):

@@ -37,7 +37,7 @@ class Net(nn.Module):
     def build_PCA_model(self, PCA_path):
 
         with torch.no_grad():
-            latent = torch.randn((1000000, 512), dtype=torch.float32)
+            latent = torch.randn((1, 512), dtype=torch.float32)
             # latent = torch.randn((10000, 512), dtype=torch.float32)
             self.generator.style.cpu()
             pulse_space = torch.nn.LeakyReLU(5)(self.generator.style(latent)).numpy()

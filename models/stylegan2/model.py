@@ -404,6 +404,8 @@ class Generator(nn.Module):
             1024: 16 * channel_multiplier,
         }
 
+        
+
 
         self.input = ConstantInput(self.channels[4])
         self.conv1 = StyledConv(

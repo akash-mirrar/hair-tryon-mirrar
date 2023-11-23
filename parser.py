@@ -40,7 +40,7 @@ param_parser.add_argument('--learning_rate', type=float, default=0.01, help='Lea
 param_parser.add_argument('--lr_schedule', type=str, default='fixed', help='fixed, linear1cycledrop, linear1cycle')
 param_parser.add_argument('--save_intermediate', action='store_true',
                     help='Whether to store and save intermediate HR and LR images during optimization')
-param_parser.add_argument('--save_interval', type=int, default=400, help='Latent checkpoint interval')
+param_parser.add_argument('--save_interval', type=int, default=100, help='Latent checkpoint interval')
 param_parser.add_argument('--verbose', action='store_true', help='Print loss information')
 param_parser.add_argument('--seg_ckpt', type=str, default='pretrained_models/seg.pth')
 # Embedding loss options
@@ -48,17 +48,17 @@ param_parser.add_argument('--percept_lambda', type=float, default=1.0, help='Per
 param_parser.add_argument('--l2_lambda', type=float, default=1.0, help='L2 loss multiplier factor')
 param_parser.add_argument('--p_norm_lambda', type=float, default=0.001, help='P-norm Regularizer multiplier factor')
 param_parser.add_argument('--l_F_lambda', type=float, default=0.5, help='L_F loss multiplier factor')
-param_parser.add_argument('--W_steps', type=int, default=100, help='Default: 100 - Number of W space optimization steps')
-param_parser.add_argument('--FS_steps', type=int, default=200, help='Deafult: 50Number of FS space optimization st')
+param_parser.add_argument('--W_steps', type=int, default=150, help='Default: 150, 100 - Number of W space optimization steps')
+param_parser.add_argument('--FS_steps', type=int, default=50, help='Deafult: 50Number of FS space optimization st')
 # Alignment loss options
 param_parser.add_argument('--ce_lambda', type=float, default=1.0, help='cross entropy loss multiplier factor')
 param_parser.add_argument('--style_lambda', type=str, default=4e4, help='style loss multiplier factor')
-param_parser.add_argument('--align_steps1', type=int, default=1, help='')
-param_parser.add_argument('--align_steps2', type=int, default=1, help='')
+param_parser.add_argument('--align_steps1', type=int, default=10, help='')
+param_parser.add_argument('--align_steps2', type=int, default=10, help='')
 # Blend loss options
 param_parser.add_argument('--face_lambda', type=float, default=2, help='')
 param_parser.add_argument('--hair_lambda', type=str, default=10.0, help='')
-param_parser.add_argument('--blend_steps', type=int, default=200, help='deafult: 30')
+param_parser.add_argument('--blend_steps', type=int, default=150, help='deafult: 30')
 
 
 # args = param_parser.parse_args()
