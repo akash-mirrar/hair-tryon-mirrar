@@ -8,9 +8,6 @@ MONGO_URI = os.environ.get('MONGO_URI')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 collection_name = "hair_tryon"
 
-# Create a MongoDB client
-# ca = certifi.where()
-
 client = pymongo.MongoClient(MONGO_URI)
 
 # Access your database and collection

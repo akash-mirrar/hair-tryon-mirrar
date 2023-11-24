@@ -7,3 +7,5 @@
 /pretrained_models
 
 /junk
+
+/__pycache__
