@@ -13,7 +13,7 @@ from swap import swap_face
 from pathlib import Path
 import torch
 from parser import align_parser, param_parser
-
+from datetime import datetime
 import torch
 import torch.multiprocessing as mp
 from multiprocessing import freeze_support
@@ -27,6 +27,8 @@ user_collection = db["user"]
 
 def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
     # with lock:
+    start_time = datetime.now()
+    print(f"Starting Embedding for User: {current_user_phone} : {start_time}")
     filter_criteria = {"phone_no": current_user_phone}  # Replace with the actual criteria to identify the document
     data_to_append = {"filename": filename.split('.')[0]+'.png'}
     update_operation = {"$set": data_to_append}
@@ -49,9 +51,14 @@ def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
 
     processing_dict[current_user_phone] = "Completed"
 
+    end_time = datetime.now()
+    print(f"Starting Embedding for User: {current_user_phone} : {end_time}")
+    print(f"Time taken in Embedding for User {current_user_phone} -> {end_time-start_time}")
+
 
 def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
-    
+    start_time = datetime.now()
+    print(f"Starting Reconstruction for User: {current_user_phone} : {start_time}")
     param_args = param_parser.parse_args()
     param_args.im_path1 = filename
     param_args.im_path2 = ref_img_path
@@ -60,6 +67,10 @@ def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
     run_alignment(param_args)
     
     blend_images(param_args)
+
+    end_time = datetime.now()
+    print(f"Ending Reconstruction for User: {current_user_phone} : {end_time}")
+    print(f"Time taken in Reconstruction for User {current_user_phone} -> {end_time-start_time}")
     
     # swap_face(param_args, current_user)
     
