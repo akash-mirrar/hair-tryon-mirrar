@@ -17,7 +17,7 @@ from swap import swap_face
 def generate_embeddings(args):
     try:
         ii2_start_time = datetime.now()
-        print(f"### Starting II2S Embedding ###: {ii2_start_time}")
+        # print(f"Embedding start time: {ii2_start_time}")
         embeddings = Embedding(args)
 
         im_path1 = os.path.join(args.input_dir, args.im_path1)
@@ -30,15 +30,15 @@ def generate_embeddings(args):
         embeddings.invert_images_in_FS([*im_set])
 
         ii2_end_time = datetime.now()
-        print(f"### Completed II2S Embedding ###: {ii2_end_time}")
-        print(f"Time taken for II2S embedding: {ii2_end_time-ii2_start_time}")
+        # print(f"Embedding end time: {ii2_end_time}")
+        # print(f"Time taken for embedding: {ii2_end_time-ii2_start_time}")
     except Exception as e:
         raise(e)
 
 def run_alignment(args):
     try:
         alignment_start_time = datetime.now()
-        print(f"### Starting Alignment ###: {alignment_start_time}")
+        # print(f"### Starting Alignment ###: {alignment_start_time}")
         im_path1 = os.path.join(args.input_dir, args.im_path1)
         im_path2 = os.path.join(args.input_dir, args.im_path2)
         im_path3 = os.path.join(args.input_dir, args.im_path3)
@@ -49,15 +49,15 @@ def run_alignment(args):
         if im_path2 != im_path3:
             align.align_images(im_path1,im_path3, sign=args.sign, align_more_region=False, smooth=args.smooth)
         alignment_end_time = datetime.now()
-        print(f"### Ending alignment: {alignment_end_time}")
-        print(f"Time taken for alignment: {alignment_end_time-alignment_start_time}")
+        # print(f"### Ending alignment: {alignment_end_time}")
+        # print(f"Time taken for alignment: {alignment_end_time-alignment_start_time}")
     except Exception as e:
         raise(e)
 
 def blend_images(args):
     try:
         blending_start_time = datetime.now()
-        print(f"### Starting Blending: {blending_start_time}")
+        # print(f"### Starting Blending: {blending_start_time}")
         im_path1 = os.path.join(args.input_dir, args.im_path1)
         im_path2 = os.path.join(args.input_dir, args.im_path2)
         im_path3 = os.path.join(args.input_dir, args.im_path3)
@@ -66,8 +66,8 @@ def blend_images(args):
 
         blending_end_time = datetime.now()
         blend.blend_images(im_path1, im_path2, im_path3, sign=args.sign)
-        print(f"### Completing blending: {blending_end_time}")
-        print(f"Time taken for Bledning: {blending_end_time-blending_start_time}")
+        # print(f"### Completing blending: {blending_end_time}")
+        # print(f"Time taken for Bledning: {blending_end_time-blending_start_time}")
     except Exception as e:
         raise(e)
 # def main(args):

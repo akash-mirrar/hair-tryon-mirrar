@@ -17,18 +17,26 @@ from datetime import datetime
 import torch
 import torch.multiprocessing as mp
 from multiprocessing import freeze_support
+import base64
+from io import BytesIO
+from PIL import Image
 
 # manager = mp.Manager()
 # processing_dict = manager.dict()
 processing_dict = {}
+embedding_status = {}
+reconstruction_status = {}
 # lock = manager.Lock()
 
 user_collection = db["user"]
 
 def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
     # with lock:
+    # embedding_status[current_user_phone] = {}
     start_time = datetime.now()
-    print(f"Starting Embedding for User: {current_user_phone} : {start_time}")
+    # print(f"Starting Embedding for User - {current_user_phone} --> {start_time}")
+    # embedding_status[current_user_phone]["status"] = "processing"
+    # embedding_status[current_user_phone]["start_time"] = str(start_time)
     filter_criteria = {"phone_no": current_user_phone}  # Replace with the actual criteria to identify the document
     data_to_append = {"filename": filename.split('.')[0]+'.png'}
     update_operation = {"$set": data_to_append}
@@ -49,16 +57,39 @@ def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
     param_args.output_dir = os.path.join("./output", current_user_phone)
     generate_embeddings(param_args)
 
-    processing_dict[current_user_phone] = "Completed"
+    # processing_dict[current_user_phone] = "Completed"
 
     end_time = datetime.now()
-    print(f"Starting Embedding for User: {current_user_phone} : {end_time}")
-    print(f"Time taken in Embedding for User {current_user_phone} -> {end_time-start_time}")
+    duration = end_time-start_time
+    # print(f"Starting Embedding for User: {current_user_phone} : {end_time}")
+    # embedding_status[current_user_phone]["status"] = "completed"
+    print(f"Time taken in Embedding - {current_user_phone} --> {end_time-start_time}")
+    # print(embedding_status)
+    # embedding_status[current_user_phone]["end_time"] = str(end_time)
+    # embedding_status[current_user_phone]["duration"] = str(duration)
+
+    update_data = {
+        "$set": {
+            "embedding": {
+                "status": "completed",
+                "start_time": str(start_time),
+                "end_time": str(end_time),
+                "duration": str(duration)
+            }
+        }
+    }
+
+    user_collection.update_one({"phone_no": current_user_phone}, update_data)
+    # print("Embedding status \n", embedding_status)
 
 
 def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
+    # reconstruction_status[current_user_phone] = {}
+    # reconstruction_status[current_user_phone]["status"] = "processing"
+    
     start_time = datetime.now()
-    print(f"Starting Reconstruction for User: {current_user_phone} : {start_time}")
+    print(f"Starting Reconstruction for User - {current_user_phone} ---> {start_time}")
+    # reconstruction_status[current_user_phone]["start_time"] = str(start_time)
     param_args = param_parser.parse_args()
     param_args.im_path1 = filename
     param_args.im_path2 = ref_img_path
@@ -69,9 +100,28 @@ def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
     blend_images(param_args)
 
     end_time = datetime.now()
-    print(f"Ending Reconstruction for User: {current_user_phone} : {end_time}")
-    print(f"Time taken in Reconstruction for User {current_user_phone} -> {end_time-start_time}")
+    duration = end_time - start_time
+    print(f"Ending Reconstruction for User - {current_user_phone} - {end_time}")
+    # reconstruction_status[current_user_phone]["status"] = "completed"
     
+    print(f"Time taken in Reconstruction for User {current_user_phone}--> {end_time-start_time}")
+    # reconstruction_status[current_user_phone]["end_time"] = str(end_time)
+    # embedding_status[current_user_phone]["duration"] = str(duration)
+
+    print("Reconstruction status \n", reconstruction_status)
+
+    update_data = {
+        "$set": {
+            "reconstruction": {
+                "status": "completed",
+                "start_time": str(start_time),
+                "end_time": str(end_time),
+                "duration": str(duration)
+            }
+        }
+    }
+
+    user_collection.update_one({"phone_no": current_user_phone}, update_data)
     # swap_face(param_args, current_user)
     
     # return jsonify(message="Alignment and Blending done successfully")
@@ -113,19 +163,28 @@ def create_app(align_parser, param_parser):
     @app.route("/embed", methods=['POST'])
     @token_required
     def embed(current_user):
-        f = request.files['file']
-        ref_img_path = request.form.get('ref_img_path')
+        data = request.json
+        base64_img = data["base_64_image"]
+        image_data = base64.b64decode(base64_img)
         remove_files(current_user)
-        f.save(os.path.join('./upload_dir/'+current_user.get("phone_no")+"/", f.filename.split('.')[0]+'.png'))
+        filename = current_user["phone_no"]+".png"
+        with open("./upload_dir/"+current_user["phone_no"]+"/"+filename, "wb") as f:
+            f.write(image_data)
+
+        ref_img_path = data['ref_img_path']
+        # f = request.files['file']
+        # ref_img_path = request.form.get('ref_img_path')
+        
+        # f.save(os.path.join('./upload_dir/'+current_user.get("phone_no")+"/", current_user["phone_no"]+'.png'))
         
         # with lock:
-        if current_user["phone_no"] in processing_dict:
+        if current_user["phone_no"] in embedding_status:
             phone_no = current_user["phone_no"]
             return jsonify(message=f"User with {phone_no}'s request is already processing"), 403
         
         mp.Process(
             target=process_embedding_endpoint,
-            args=(current_user["phone_no"], f.filename, ref_img_path)
+            args=(current_user["phone_no"], filename, ref_img_path)
         ).start()
         
         return jsonify({
@@ -139,7 +198,7 @@ def create_app(align_parser, param_parser):
     def tryon(current_user):
         ref_img_path = request.form.get('ref_img_path')
         
-        if current_user["phone_no"] is processing_dict:
+        if current_user["phone_no"] is reconstruction_status:
             phone_no = current_user["phone_no"]
             return jsonify(message="User with {phone_no}'s request is already processing"), 403
 
@@ -147,6 +206,8 @@ def create_app(align_parser, param_parser):
             target=process_reconstruction_endpoint,
             args=(current_user["phone_no"], current_user["filename"], ref_img_path)
         ).start()
+
+        # print()
 
         return jsonify({
             "Success": "Embeddings generated successfully"

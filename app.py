@@ -53,6 +53,7 @@ def create_app(align_parser, param_parser):
     @app.route("/embed", methods=['POST'])
     @token_required
     def embed(current_user):
+        print("FILESS: ", request.files)
         f = request.files['file']
         ref_img_path = request.form.get('ref_img_path')
         remove_files(current_user)
