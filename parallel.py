@@ -21,26 +21,20 @@ import base64
 from io import BytesIO
 from PIL import Image
 
-# manager = mp.Manager()
-# processing_dict = manager.dict()
-processing_dict = {}
 embedding_status = {}
 reconstruction_status = {}
-# lock = manager.Lock()
+
 
 user_collection = db["user"]
 
 def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
-    # with lock:
-    # embedding_status[current_user_phone] = {}
     start_time = datetime.now()
-    # print(f"Starting Embedding for User - {current_user_phone} --> {start_time}")
-    # embedding_status[current_user_phone]["status"] = "processing"
-    # embedding_status[current_user_phone]["start_time"] = str(start_time)
+    
     filter_criteria = {"phone_no": current_user_phone}  # Replace with the actual criteria to identify the document
     data_to_append = {"filename": filename.split('.')[0]+'.png'}
     update_operation = {"$set": data_to_append}
     user_collection.update_one(filter_criteria, update_operation)
+
     #run face alignment
     align_args = align_parser.parse_args()
     align_args.upload_dir = os.path.join("upload_dir", str(current_user_phone))
@@ -50,23 +44,17 @@ def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
 
     #Generate embeddings
     param_args = param_parser.parse_args()
-    # param_args.input_dir = os.path.join("./input/face", current_user.phone_no)
     param_args.im_path1 = filename.split(".")[0]+".png"
     param_args.im_path2 = ref_img_path
     param_args.im_path3 = ref_img_path
     param_args.output_dir = os.path.join("./output", current_user_phone)
     generate_embeddings(param_args)
 
-    # processing_dict[current_user_phone] = "Completed"
 
     end_time = datetime.now()
     duration = end_time-start_time
-    # print(f"Starting Embedding for User: {current_user_phone} : {end_time}")
-    # embedding_status[current_user_phone]["status"] = "completed"
+    
     print(f"Time taken in Embedding - {current_user_phone} --> {end_time-start_time}")
-    # print(embedding_status)
-    # embedding_status[current_user_phone]["end_time"] = str(end_time)
-    # embedding_status[current_user_phone]["duration"] = str(duration)
 
     update_data = {
         "$set": {
@@ -80,16 +68,12 @@ def process_embedding_endpoint(current_user_phone, filename, ref_img_path):
     }
 
     user_collection.update_one({"phone_no": current_user_phone}, update_data)
-    # print("Embedding status \n", embedding_status)
 
 
 def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
-    # reconstruction_status[current_user_phone] = {}
-    # reconstruction_status[current_user_phone]["status"] = "processing"
-    
     start_time = datetime.now()
     print(f"Starting Reconstruction for User - {current_user_phone} ---> {start_time}")
-    # reconstruction_status[current_user_phone]["start_time"] = str(start_time)
+    
     param_args = param_parser.parse_args()
     param_args.im_path1 = filename
     param_args.im_path2 = ref_img_path
@@ -102,11 +86,8 @@ def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
     end_time = datetime.now()
     duration = end_time - start_time
     print(f"Ending Reconstruction for User - {current_user_phone} - {end_time}")
-    # reconstruction_status[current_user_phone]["status"] = "completed"
     
     print(f"Time taken in Reconstruction for User {current_user_phone}--> {end_time-start_time}")
-    # reconstruction_status[current_user_phone]["end_time"] = str(end_time)
-    # embedding_status[current_user_phone]["duration"] = str(duration)
 
     print("Reconstruction status \n", reconstruction_status)
 
@@ -124,7 +105,6 @@ def process_reconstruction_endpoint(current_user_phone, filename, ref_img_path):
     user_collection.update_one({"phone_no": current_user_phone}, update_data)
     # swap_face(param_args, current_user)
     
-    # return jsonify(message="Alignment and Blending done successfully")
 
 
 def create_app(align_parser, param_parser):
@@ -172,12 +152,7 @@ def create_app(align_parser, param_parser):
             f.write(image_data)
 
         ref_img_path = data['ref_img_path']
-        # f = request.files['file']
-        # ref_img_path = request.form.get('ref_img_path')
         
-        # f.save(os.path.join('./upload_dir/'+current_user.get("phone_no")+"/", current_user["phone_no"]+'.png'))
-        
-        # with lock:
         if current_user["phone_no"] in embedding_status:
             phone_no = current_user["phone_no"]
             return jsonify(message=f"User with {phone_no}'s request is already processing"), 403
@@ -190,8 +165,6 @@ def create_app(align_parser, param_parser):
         return jsonify({
             "Success": "Embeddings generated successfully"
         })
-        # except Exception as e:
-        #     return jsonify(message=str(e)), 403
 
     @app.route("/tryon", methods=['POST'])
     @token_required
@@ -221,6 +194,5 @@ if __name__ == '__main__':
     # from parser import align_parser, param_parser
     mp.set_start_method('spawn', force=True)
     # freeze_support()
-    print(cuda.Device(0).name())
     app = create_app(align_parser, param_parser)
     app.run(host='0.0.0.0', port=5000, threaded=True, debug=True)
